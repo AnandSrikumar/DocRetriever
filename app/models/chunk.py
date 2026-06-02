@@ -1,0 +1,11 @@
+from dataclasses import dataclass
+from typing import Any
+from uuid import UUID
+
+
+@dataclass
+class Chunk:
+    id: UUID
+    doc_id: UUID
+    text: str
+    metadata: dict[str, Any]

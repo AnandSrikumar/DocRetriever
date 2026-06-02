@@ -1,0 +1,28 @@
+[project]
+name = "docretriever"
+version = "0.1.0"
+description = "A light weight document retriever app"
+authors = [
+    {name = "AnandSrikumar",email = "anand.srikumar007@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "numpy (>=2.4.6,<3.0.0)",
+    "pandas (>=3.0.3,<4.0.0)",
+    "scikit-learn (>=1.8.0,<2.0.0)",
+    "nltk (>=3.9.4,<4.0.0)",
+    "langchain (>=1.3.2,<2.0.0)",
+    "pytest (>=9.0.3,<10.0.0)",
+    "pymupdf (>=1.27.2.3,<2.0.0.0)",
+    "python-docx (>=1.2.0,<2.0.0)",
+    "black (>=26.5.1,<27.0.0)",
+    "isort (>=8.0.1,<9.0.0)",
+    "langchain-text-splitters (>=1.1.2,<2.0.0)",
+    "gensim (>=4.4.0,<5.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
