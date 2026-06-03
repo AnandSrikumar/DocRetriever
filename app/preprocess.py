@@ -1,10 +1,10 @@
-from concurrent.futures import ProcessPoolExecutor
 import re
 import unicodedata
+from concurrent.futures import ProcessPoolExecutor
 
-from nltk.stem import WordNetLemmatizer
 from nltk import pos_tag, word_tokenize
-from nltk.corpus import wordnet, stopwords
+from nltk.corpus import stopwords, wordnet
+from nltk.stem import WordNetLemmatizer
 
 from app.models.chunk import Chunk
 
@@ -20,6 +20,7 @@ nltk.download("wordnet")
 nltk.download("omw-1.4")
 nltk.download("stopwords")
 """
+
 
 def _get_wordnet_pos(tag: str):
     """

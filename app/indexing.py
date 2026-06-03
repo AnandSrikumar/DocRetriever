@@ -1,5 +1,5 @@
-from argparse import Namespace
 import time
+from argparse import Namespace
 
 from app.chunker import chunk_docs
 from app.loader import create_doc_id_map, load_docs

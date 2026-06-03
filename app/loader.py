@@ -1,7 +1,7 @@
 import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from pathlib import Path
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 
 import pymupdf
 from docx import Document as DocxDocument
