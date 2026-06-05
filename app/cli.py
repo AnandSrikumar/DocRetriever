@@ -9,7 +9,10 @@ def get_args():
     index_parser.add_argument("--chunking", default="recursive")
     index_parser.add_argument("--chunk-size", default=1000)
     index_parser.add_argument("--chunk-overlap", default=100)
+    index_parser.add_argument("--index-loc", default="indexed/")
 
     search_parser = subparsers.add_parser("search", help="Search documents")
-    search_parser.add_argument("--query", required=True)
+    search_parser.add_argument("--search_method", default='tfidf')
+    search_parser.add_argument("--index-loc", default="indexed/")
+    search_parser.add_argument("--top-k", default=3)
     return parser.parse_args()

@@ -90,8 +90,8 @@ def preprocessing_pipeline_stop_words(text):
     return rem_stop_words(text)
 
 
-def preprocess_text(chunks: list[Chunk], stop_words: bool):
-    texts = [chunk.text for chunk in chunks]
+def preprocess_text(chunks: list[Chunk] | list[str], stop_words: bool):
+    texts = [chunk.text if isinstance(chunk, Chunk) else chunk for chunk in chunks]
     preproc_func = (
         preprocessing_pipeline_stop_words if stop_words else preprocessing_pipeline
     )
