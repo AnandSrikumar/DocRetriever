@@ -74,3 +74,9 @@ python main.py search --search-method word2vec  --top-k 4
 ## running it
 
 check main.py, you can save the results in a json too. feel free to modify
+
+# Optimizations needed
+
+1. The loading of embedding model is too slow, need to investigate
+2. speed up the search for tfidf and bow
+3. speed up the indexing. explore parallelism for embeddings
