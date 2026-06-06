@@ -1,3 +1,6 @@
+from concurrent.futures import ProcessPoolExecutor
+
+from app.models.chunk import Chunk
 from app.text_preprocess.preprocess_funcs import (lemmatize_text, lower_text,
                                                   normalize_unicode,
                                                   rem_extra_spaces,
@@ -46,3 +49,16 @@ def embed_preprocess(text: str):
     )
     text = preprocess.process(text)
     return text
+
+preprocess_map = {"vector": vectorizer_preprocess,
+                  "embed": embed_preprocess}
+
+
+def preprocess_text(chunks: list[Chunk], preprocess_step: str) -> list[str]:
+    preproc = preprocess_map.get(preprocess_step)
+    if not preproc:
+        raise AttributeError("Invalid preorpcess step")
+    texts = [chunk.text if isinstance(chunk, Chunk) else chunk for chunk in chunks]
+    with ProcessPoolExecutor() as executor:
+        cleaned = list(executor.map(preproc, texts))
+    return cleaned

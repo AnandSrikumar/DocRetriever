@@ -1,4 +1,4 @@
-from app.preprocess import (
+from app.text_preprocess.preprocess_funcs import (
     rem_extra_spaces,
     rem_special_chars,
     rem_stop_words,

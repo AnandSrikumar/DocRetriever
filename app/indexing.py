@@ -5,10 +5,10 @@ from app.chunking.chunker import chunk_docs
 from app.file_loaders.loader import LoaderFactory
 from app.models.document import Document
 from app.pickle_util import save_pickle
-from app.preprocess import preprocess_text
 from app.profiling_utils import timeit
 from app.vectorizer import vectorize
 from app.word_embeddings import embed_chunks
+from app.text_preprocess.preprocess import preprocess_text
 
 
 @timeit  # type: ignore
@@ -27,8 +27,8 @@ def create_chunks(
     index_loc: str,
 ) -> tuple[list[str], list[str]]:
     chunks = chunk_docs(docs, chunk_type, chunk_size, chunk_overlap)
-    cleaned_chunks = preprocess_text(chunks, True)
-    cleaned_chunks_embeds = preprocess_text(chunks, False)
+    cleaned_chunks = preprocess_text(chunks, 'vector')
+    cleaned_chunks_embeds = preprocess_text(chunks, 'embed')
     save_pickle(chunks, f"{index_loc}/chunks.pkl")
     save_pickle(cleaned_chunks, f"{index_loc}/cleaned_chunks.pkl")
     save_pickle(cleaned_chunks_embeds, f"{index_loc}/cleaned_chunks_embeds.pkl")
