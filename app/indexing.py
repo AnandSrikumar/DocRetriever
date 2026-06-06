@@ -1,7 +1,7 @@
 import time
 from argparse import Namespace
 
-from app.chunker import chunk_docs
+from app.chunking.chunker import chunk_docs
 from app.file_loaders.loader import LoaderFactory
 from app.models.document import Document
 from app.pickle_util import save_pickle
