@@ -1,13 +1,15 @@
-from app.pickle_util import load_pickle
-from app.profiling_utils import timeit
-
-from app.models.document import Document
-from app.models.chunk import Chunk
-from app.preprocess import preprocess_text
-
+import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-import numpy as np
+from app.models.chunk import Chunk
+from app.models.document import Document
+from app.pickle_util import load_pickle
+from app.preprocess import preprocess_text
+from app.profiling_utils import timeit
+
+
+def pdf_search(document: Document):
+    relevants = []
 
 
 class Search:
@@ -51,10 +53,7 @@ class Search:
         q_vector = vectorizer.transform(cleaned_query)
         scores = cosine_similarity(q_vector, self.tfidf_vectors)
         scores = scores.flatten()
-        indices = np.argpartition(
-                    scores,
-                    -self.top_k
-                )[-self.top_k:]
+        indices = np.argpartition(scores, -self.top_k)[-self.top_k :]
         self._get_relevant_docs(indices, scores)
 
     def search(self, query: str):

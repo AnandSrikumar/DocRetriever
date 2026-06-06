@@ -2,7 +2,7 @@ import time
 from argparse import Namespace
 
 from app.chunker import chunk_docs
-from app.loader import create_doc_id_map, load_docs
+from app.file_loaders.loader import LoaderFactory
 from app.models.document import Document
 from app.pickle_util import save_pickle
 from app.preprocess import preprocess_text
@@ -13,8 +13,7 @@ from app.word_embeddings import embed_chunks
 
 @timeit  # type: ignore
 def create_docs(data_dir: str, index_loc: str) -> list[Document]:
-    docs = load_docs(data_dir)
-    doc_id_map = create_doc_id_map(docs)
+    docs, doc_id_map = LoaderFactory.load(data_dir)
     save_pickle(doc_id_map, f"{index_loc}/doc_id_map.pkl")
     return docs
 
