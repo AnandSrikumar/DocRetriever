@@ -1,6 +1,3 @@
-from concurrent.futures import ProcessPoolExecutor
-from functools import partial
-
 import gensim.downloader as api
 import numpy as np
 

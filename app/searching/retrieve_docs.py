@@ -15,7 +15,7 @@ def _get_page(starts: list[int], offset: int) -> int:
 def generate_pdf_report(doc: Document, chunk: Chunk, score: float) -> dict:
     chunk_start_offset = chunk.start_offset
     chunk_end_offset = chunk.end_offset
-    page_offsets = list(doc.metadata["page-offsets"].values())
+    page_offsets = sorted(list(doc.metadata["page-offsets"].values()))
     ps = _get_page(page_offsets, chunk_start_offset)
     pe = _get_page(page_offsets, chunk_end_offset)
     return {
@@ -23,7 +23,7 @@ def generate_pdf_report(doc: Document, chunk: Chunk, score: float) -> dict:
         "file_name": doc.source,
         "page_start": ps,
         "page_end": pe,
-        "score": score,
+        "score": float(score),
         "text": chunk.text,
     }
 
@@ -32,7 +32,7 @@ def generate_text_report(doc: Document, chunk: Chunk, score: float):
     return {
         "file_type": "txt",
         "file_name": doc.source,
-        "score": score,
+        "score": float(score),
         "text": chunk.text,
     }
 
@@ -41,7 +41,7 @@ def generate_docx_report(doc: Document, chunk: Chunk, score: float):
     return {
         "file_type": "docx",
         "file_name": doc.source,
-        "score": score,
+        "score": float(score),
         "text": chunk.text,
     }
 

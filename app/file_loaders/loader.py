@@ -2,7 +2,6 @@ import time
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Protocol
-from uuid import UUID
 
 from app.file_loaders.docx_loader import DocxLoader
 from app.file_loaders.pdf_loader import PdfLoader
