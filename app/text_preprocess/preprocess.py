@@ -50,11 +50,11 @@ def embed_preprocess(text: str):
     text = preprocess.process(text)
     return text
 
-preprocess_map = {"vector": vectorizer_preprocess,
-                  "embed": embed_preprocess}
+
+preprocess_map = {"vector": vectorizer_preprocess, "embed": embed_preprocess}
 
 
-def preprocess_text(chunks: list[Chunk], preprocess_step: str) -> list[str]:
+def preprocess_text(chunks: list[Chunk] | list[str], preprocess_step: str) -> list[str]:
     preproc = preprocess_map.get(preprocess_step)
     if not preproc:
         raise AttributeError("Invalid preorpcess step")

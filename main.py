@@ -1,7 +1,7 @@
 from app.cli import get_args
 
 from app.indexing import build_index
-from app.search import Search
+from app.searching.search import Search
 
 def main():
     args = get_args()
