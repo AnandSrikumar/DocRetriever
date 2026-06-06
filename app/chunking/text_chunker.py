@@ -1,9 +1,7 @@
 from uuid import uuid4
 
-from langchain_text_splitters import (
-    CharacterTextSplitter,
-    RecursiveCharacterTextSplitter,
-)
+from langchain_text_splitters import (CharacterTextSplitter,
+                                      RecursiveCharacterTextSplitter)
 
 from app.models.chunk import Chunk
 from app.models.document import Document
