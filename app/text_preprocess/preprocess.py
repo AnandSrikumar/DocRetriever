@@ -1,11 +1,14 @@
 from concurrent.futures import ProcessPoolExecutor
 
 from app.models.chunk import Chunk
-from app.text_preprocess.preprocess_funcs import (lemmatize_text, lower_text,
-                                                  normalize_unicode,
-                                                  rem_extra_spaces,
-                                                  rem_special_chars,
-                                                  rem_stop_words)
+from app.text_preprocess.preprocess_funcs import (
+    lemmatize_text,
+    lower_text,
+    normalize_unicode,
+    rem_extra_spaces,
+    rem_special_chars,
+    rem_stop_words,
+)
 
 
 class Preprocess:

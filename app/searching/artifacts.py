@@ -18,6 +18,7 @@ class SearchArtifacts:
 
     word2vec_embeddings: object
     fasttext_embeddings: object
+    all_lm_embeddings: object
 
 
 class ArtifactLoader:
@@ -34,4 +35,5 @@ class ArtifactLoader:
             bow_vectors=load_pickle(f"{indexed_loc}bow_vectors.pkl"),
             word2vec_embeddings=load_pickle(f"{indexed_loc}word2vec_embeddings.pkl"),
             fasttext_embeddings=load_pickle(f"{indexed_loc}fasttext_embeddings.pkl"),
+            all_lm_embeddings=load_pickle(f"{indexed_loc}all_minilm_embeddings.pkl"),
         )

@@ -220,3 +220,4 @@ __marimo__/
 data/*
 indexed/*
 results/*
+dry_run.py

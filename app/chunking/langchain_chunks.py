@@ -1,5 +1,7 @@
-from langchain_text_splitters import (CharacterTextSplitter,
-                                      RecursiveCharacterTextSplitter)
+from langchain_text_splitters import (
+    CharacterTextSplitter,
+    RecursiveCharacterTextSplitter,
+)
 
 from app.chunking.text_chunker import chunk_text
 from app.models.document import Document

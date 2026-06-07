@@ -2,13 +2,13 @@ import time
 from argparse import Namespace
 
 from app.chunking.chunker import chunk_docs
+from app.embeddings.word_embedings import Embed
 from app.file_loaders.loader import LoaderFactory
 from app.models.document import Document
 from app.pickle_util import save_pickle
 from app.profiling_utils import timeit
 from app.text_preprocess.preprocess import preprocess_text
 from app.vectorizer import vectorize
-from app.word_embeddings import embed_chunks
 
 
 @timeit  # type: ignore
@@ -47,12 +47,15 @@ def create_vectors(cleaned_chunks: list[str], index_loc: str) -> None:
 
 @timeit  # type: ignore
 def create_embeds(cleaned_chunks: list[str], index_loc: str) -> None:
-    w2vec_embeddings = embed_chunks(cleaned_chunks, "word2vec")
+    embed = Embed()
+    w2vec_embeddings = embed.embed_chunks(cleaned_chunks, "word2vec")
     print("w2vec done")
-    ftext_embeddings = embed_chunks(cleaned_chunks, "fasttext")
+    ftext_embeddings = embed.embed_chunks(cleaned_chunks, "fasttext")
     print("fasttext done...")
+    sentence_embeddings = embed.embed_chunks(cleaned_chunks, "all-minilm")
     save_pickle(w2vec_embeddings, f"{index_loc}/word2vec_embeddings.pkl")
     save_pickle(ftext_embeddings, f"{index_loc}/fasttext_embeddings.pkl")
+    save_pickle(sentence_embeddings, f"{index_loc}/all_minilm_embeddings.pkl")
 
 
 def build_index(args: Namespace):

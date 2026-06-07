@@ -2,10 +2,10 @@ import gensim.downloader as api
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
+from app.embeddings.word_embedings import Embed, get_model_names
 from app.searching.artifacts import ArtifactLoader
 from app.searching.retrieve_docs import retrieve_doc
 from app.text_preprocess.preprocess import preprocess_text
-from app.word_embeddings import embed_text, model_map
 
 
 class Search:
@@ -26,9 +26,7 @@ class Search:
         self.embed_model_map = None
 
     def load_gensim_models(self):
-        self.fasttext = api.load(model_map["fasttext"])
-        self.word2vec = api.load(model_map["word2vec"])
-        self.embed_model_map = {"word2vec": self.word2vec, "fasttext": self.fasttext}
+        self.embed = Embed()
 
     def search_vectors(self, query: str):
         vectorizer = self.vector_map.get(self.search_metric)
@@ -43,12 +41,8 @@ class Search:
         return top_idxs, top_scores
 
     def search_embeds(self, query: str):
-        embeds = self.embed_map.get(self.search_metric)
-        if embeds is None:
-            raise AttributeError("Invalid embeddings")
-        model = self.embed_model_map[self.search_metric]
         cleaned_query = preprocess_text([query], "vector")[0]
-        q_vector = embed_text(cleaned_query, model)
+        q_vector = self.embed.embed_chunks([cleaned_query], self.search_metric)[0]
         scores = cosine_similarity(
             q_vector.reshape(1, -1),
             embeds,  # type: ignore
@@ -76,7 +70,7 @@ class Search:
             )
             print(results)
             return results
-        if self.embed_model_map is None:
+        if self.embed is None:
             self.load_gensim_models()
         top_idx, top_scores = self.search_embeds(query)
         return retrieve_doc(
