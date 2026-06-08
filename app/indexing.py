@@ -52,10 +52,10 @@ def create_embeds(cleaned_chunks: list[str], index_loc: str) -> None:
     print("w2vec done")
     ftext_embeddings = embed.embed_chunks(cleaned_chunks, "fasttext")
     print("fasttext done...")
-    sentence_embeddings = embed.embed_chunks(cleaned_chunks, "all-minilm")
+    # sentence_embeddings = embed.embed_chunks(cleaned_chunks, "all-minilm")
     save_pickle(w2vec_embeddings, f"{index_loc}/word2vec_embeddings.pkl")
     save_pickle(ftext_embeddings, f"{index_loc}/fasttext_embeddings.pkl")
-    save_pickle(sentence_embeddings, f"{index_loc}/all_minilm_embeddings.pkl")
+    # save_pickle(sentence_embeddings, f"{index_loc}/all_minilm_embeddings.pkl")
 
 
 def build_index(args: Namespace):
