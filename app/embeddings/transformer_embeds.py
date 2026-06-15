@@ -20,8 +20,6 @@ class TransformerEmbeds:
             raise AttributeError("Invalid model...")
         sentence_model = self._get_model(model)
         vectors = sentence_model.encode(
-            chunks,
-            normalize_embeddings=True,
-            convert_to_numpy=True,
+            chunks, normalize_embeddings=True, convert_to_numpy=True, batch_size=64
         ).astype(np.float32)
         return vectors

@@ -12,7 +12,11 @@ def get_args():
     index_parser.add_argument("--index-loc", default="indexed/")
 
     search_parser = subparsers.add_parser("search", help="Search documents")
-    search_parser.add_argument("--search-method", default="tfidf", choices=["word2vec", "fasttext", "tfidf", 'bow'],)
+    search_parser.add_argument(
+        "--search-method",
+        default="tfidf",
+        choices=["word2vec", "fasttext", "tfidf", "bow"],
+    )
     search_parser.add_argument("--index-loc", default="indexed/")
     search_parser.add_argument("--top-k", default=3)
     return parser.parse_args()

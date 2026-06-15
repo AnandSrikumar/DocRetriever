@@ -15,6 +15,7 @@ def _get_page(starts: list[int], offset: int) -> int:
 def generate_pdf_report(doc: Document, chunk: Chunk, score: float) -> dict:
     chunk_start_offset = chunk.start_offset
     chunk_end_offset = chunk.end_offset
+    print(chunk_start_offset, chunk_end_offset, " are offsets")
     page_offsets = sorted(list(doc.metadata["page-offsets"].values()))
     ps = _get_page(page_offsets, chunk_start_offset)
     pe = _get_page(page_offsets, chunk_end_offset)

@@ -68,7 +68,6 @@ class Search:
             results = retrieve_doc(
                 top_idx, top_scores, self.artifacts.chunks, self.artifacts.doc_map
             )
-            print(results)
             return results
         if self.embed is None:
             self.load_gensim_models()

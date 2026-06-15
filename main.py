@@ -22,8 +22,10 @@ def main():
             try:
                 q = input("enter query: ")
                 result = search.search(q)
-                print(result)
-                # save_query_res(result)
+                save_query_res(result)
+                for res in result:
+                    res.pop("text")
+                    print(res)
             except KeyboardInterrupt:
                 break
             except Exception:

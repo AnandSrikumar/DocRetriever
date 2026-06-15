@@ -13,6 +13,7 @@ def chunk_text(
     splitter: CharacterTextSplitter | RecursiveCharacterTextSplitter,
     doc: Document,
     chunk_type: str,
+    overlap_size: int = 100,
 ):
     text = doc.text
     chunks = splitter.split_text(text)
@@ -21,7 +22,7 @@ def chunk_text(
     for chunk in chunks:
         start_offset = text.find(chunk, current_offset)
         end_offset = start_offset + len(chunk)
-        current_offset = end_offset
+        current_offset = end_offset - overlap_size
         c = Chunk(
             id=uuid4(),
             text=chunk,

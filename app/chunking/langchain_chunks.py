@@ -11,11 +11,11 @@ def fixed_split(doc: Document, chunk_size: int, chunk_overlap: int):
     splitter = CharacterTextSplitter(
         separator="", chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )
-    return chunk_text(splitter, doc, "fixed")
+    return chunk_text(splitter, doc, "fixed", chunk_overlap)
 
 
 def recurs_split(doc: Document, chunk_size: int, chunk_overlap: int):
     splitter = RecursiveCharacterTextSplitter(
         separators=[""], chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )
-    return chunk_text(splitter, doc, "recursive")
+    return chunk_text(splitter, doc, "recursive", chunk_overlap)
