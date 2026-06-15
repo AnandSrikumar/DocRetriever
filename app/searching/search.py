@@ -22,8 +22,9 @@ class Search:
         self.embed_map = {
             "fasttext": self.artifacts.fasttext_embeddings,
             "word2vec": self.artifacts.word2vec_embeddings,
+            "sent_transform": self.artifacts.all_lm_embeddings,
         }
-        self.embed_model_map = None
+        self.embed = None
 
     def load_gensim_models(self):
         self.embed = Embed()
@@ -40,25 +41,24 @@ class Search:
         top_scores = scores[top_idxs]
         return top_idxs, top_scores
 
-    def search_embeds(self, query: str):
+    def search_embeds(self, query: str, embeds):
         cleaned_query = preprocess_text([query], "vector")[0]
-        q_vector = self.embed.embed_chunks([cleaned_query], self.search_metric)[0]
+        q_vector = self.embed.embed_chunks(
+            [cleaned_query],
+            self.search_metric,
+        )[0]
+
         scores = cosine_similarity(
             q_vector.reshape(1, -1),
-            embeds,  # type: ignore
-        )[0]
+            embeds,
+        ).ravel()
 
         k = min(self.top_k, len(scores))
 
-        top_idxs = np.argpartition(
-            scores,
-            -k,
-        )[-k:]
-
+        top_idxs = np.argpartition(scores, -k)[-k:]
         top_idxs = top_idxs[np.argsort(scores[top_idxs])[::-1]]
 
         top_scores = scores[top_idxs]
-
         return top_idxs, top_scores
 
     def search(self, query: str):
@@ -71,7 +71,8 @@ class Search:
             return results
         if self.embed is None:
             self.load_gensim_models()
-        top_idx, top_scores = self.search_embeds(query)
+        embeds = self.embed_map[self.search_metric]
+        top_idx, top_scores = self.search_embeds(query, embeds)
         return retrieve_doc(
             top_idx, top_scores, self.artifacts.chunks, self.artifacts.doc_map
         )

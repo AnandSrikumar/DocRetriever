@@ -15,7 +15,7 @@ def get_args():
     search_parser.add_argument(
         "--search-method",
         default="tfidf",
-        choices=["word2vec", "fasttext", "tfidf", "bow"],
+        choices=["word2vec", "fasttext", "tfidf", "bow", "sent_transform"],
     )
     search_parser.add_argument("--index-loc", default="indexed/")
     search_parser.add_argument("--top-k", default=3)

@@ -28,8 +28,8 @@ def main():
                     print(res)
             except KeyboardInterrupt:
                 break
-            except Exception:
-                print("try again...")
+            except Exception as e:
+                print("try again...", e)
                 continue
 
 if __name__ == "__main__":
