@@ -2,23 +2,16 @@ import time
 from argparse import Namespace
 
 from app.chunking.chunker import chunk_docs
-
+from app.configs import (SENTENCE_EMBEDDINGS_INDEX_PATH, VECTOR_INDEX_PATHS,
+                         WORD_EMBEDDING_INDEX_PATHS)
+from app.embeddings.gensim_embeds import GensimEmbeds
+from app.embeddings.transformer_embeds import TransformerEmbeds
 from app.file_loaders.loader import LoaderFactory
-
 from app.models.document import Document
 from app.pickle_util import save_pickle
 from app.profiling_utils import timeit
 from app.text_preprocess.preprocess import preprocess_text
 from app.vectorizer import vectorize
-
-from app.embeddings.gensim_embeds import GensimEmbeds
-from app.embeddings.transformer_embeds import TransformerEmbeds
-
-from app.configs import (
-    WORD_EMBEDDING_INDEX_PATHS,
-    SENTENCE_EMBEDDINGS_INDEX_PATH,
-    VECTOR_INDEX_PATHS,
-)
 
 
 @timeit  # type: ignore
