@@ -1,32 +1,23 @@
 import gensim.downloader as api
 import numpy as np
 
-model_map = {
-    "word2vec": "word2vec-google-news-300",
-    "fasttext": "fasttext-wiki-news-subwords-300",
-}
+from app.configs import WORD_EMBEDDING_MODELS
 
 
 class GensimEmbeds:
-    def __init__(self):
-        self.model_map = {}
+    def __init__(self, model: str):
+        if model not in WORD_EMBEDDING_MODELS:
+            raise ValueError("Invalid word embedding model")
+        self.model = api.load(WORD_EMBEDDING_MODELS[model])
 
-    def _get_model(self, model: str):
-        if model not in self.model_map:
-            self.model_map[model] = api.load(model_map[model])
-        return self.model_map[model]
-
-    def _embed_text(self, text: str, model):
-        vectors = [model[word] for word in text.split() if word in model]
+    def embed_chunk(self, chunk: str):
+        vectors = [self.model[word] for word in chunk.split() if word in self.model]  # type: ignore
         if not vectors:
-            return np.zeros(model.vector_size)
-        return np.mean(vectors, axis=0)
+            return np.zeros(self.model.vector_size)  # type: ignore
+        return np.mean(vectors, axis=0)  # type: ignore
 
-    def embed_chunks(self, chunks: list[str], model: str) -> np.ndarray:
-        if model not in model_map:
-            raise AttributeError("Invalid embeddings model")
-        model_gensim = self._get_model(model)
+    def embed_chunks(self, chunks: list[str]):
         vectors = np.array(
-            [self._embed_text(text, model_gensim) for text in chunks], dtype=np.float32
+            [self.embed_chunk(text) for text in chunks], dtype=np.float32
         )
         return vectors

@@ -11,57 +11,23 @@ from app.text_preprocess.preprocess_funcs import (
 )
 
 
-class Preprocess:
-    def __init__(self):
-        self.steps = []
+def preprocess_pipeline(chunk: Chunk | str):
+    text = chunk.text if isinstance(chunk, Chunk) else chunk
+    text = lower_text(text)
+    text = rem_special_chars(text)
+    text = normalize_unicode(text)
+    text = rem_extra_spaces(text)
+    text = lemmatize_text(text)
+    return {
+        "vector": text,
+        "embed": rem_stop_words(text)
+    }
 
-    def add_step(self, func):
-        self.steps.append(func)
-        return self
-
-    def process(self, text: str):
-        for step in self.steps:
-            text = step(text)
-        return text
-
-
-def vectorizer_preprocess(text: str):
-    preprocess = Preprocess()
-
-    preprocess = (
-        preprocess.add_step(lower_text)
-        .add_step(rem_special_chars)
-        .add_step(normalize_unicode)
-        .add_step(rem_extra_spaces)
-        .add_step(lemmatize_text)
-    )
-    text = preprocess.process(text)
-    return text
-
-
-def embed_preprocess(text: str):
-    preprocess = Preprocess()
-
-    preprocess = (
-        preprocess.add_step(lower_text)
-        .add_step(rem_special_chars)
-        .add_step(normalize_unicode)
-        .add_step(rem_extra_spaces)
-        .add_step(lemmatize_text)
-        .add_step(rem_stop_words)
-    )
-    text = preprocess.process(text)
-    return text
-
-
-preprocess_map = {"vector": vectorizer_preprocess, "embed": embed_preprocess}
-
-
-def preprocess_text(chunks: list[Chunk] | list[str], preprocess_step: str) -> list[str]:
-    preproc = preprocess_map.get(preprocess_step)
-    if not preproc:
-        raise AttributeError("Invalid preorpcess step")
-    texts = [chunk.text if isinstance(chunk, Chunk) else chunk for chunk in chunks]
+def preprocess_text(chunks: list[Chunk] | list[str]) -> dict[str, list[str]]:
     with ProcessPoolExecutor() as executor:
-        cleaned = list(executor.map(preproc, texts))
+        results = list(executor.map(preprocess_pipeline, chunks))
+    cleaned = {"vectors": [], "embeds": []}
+    for res in results:
+        cleaned['vectors'].append(res['vector'])
+        cleaned['embeds'].append(res['embed'])
     return cleaned
