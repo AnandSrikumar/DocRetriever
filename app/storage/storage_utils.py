@@ -19,6 +19,9 @@ def __deserialize_pickle(path: str):
 
 
 def __serialize_faiss(vectors, path: str):
+    if hasattr(vectors, "toarray"):
+        vectors = vectors.toarray()
+
     embeddings = np.asarray(
         vectors,
         dtype=np.float32,

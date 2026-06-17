@@ -221,5 +221,6 @@ data/*
 indexed/*
 vector_indexed/*
 pickle_indexed/*
+faiss_indexed/*
 results/*
 dry_run.py

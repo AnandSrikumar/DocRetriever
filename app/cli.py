@@ -9,7 +9,7 @@ def get_args():
     index_parser.add_argument("--chunking", default="recursive")
     index_parser.add_argument("--chunk-size", default=1000)
     index_parser.add_argument("--chunk-overlap", default=100)
-    index_parser.add_argument("--backend", default="pickle")
+    index_parser.add_argument("--backend", default="pickle", choices=['pickle']) # soon going to put faiss
     index_parser.add_argument("--index-loc", default="indexed/")
 
     search_parser = subparsers.add_parser("search", help="Search documents")
@@ -20,5 +20,5 @@ def get_args():
     )
     search_parser.add_argument("--index-loc", default="indexed/")
     search_parser.add_argument("--top-k", default=3)
-    search_parser.add_argument("--backend", default="pickle")
+    search_parser.add_argument("--backend", default="pickle", choices=['pickle']) # soon going to put faiss
     return parser.parse_args()
