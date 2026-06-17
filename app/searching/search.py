@@ -2,8 +2,7 @@ from typing import Protocol
 
 import numpy as np
 
-from app.configs import (SENTENCE_EMBEDDINGS_INDEX_PATH, VECTOR_INDEX_PATHS,
-                         WORD_EMBEDDING_INDEX_PATHS)
+from app.configs import EMBEDDING_MODELS, VECTORIZERS, SENTENCE_EMBEDDING_MODELS
 from app.pickle_util import load_pickle
 from app.searching.embedding_search import SentenceEmbeddingSearch, WordEmbeddingSearch
 from app.searching.retrieve_docs import retrieve_doc
@@ -19,6 +18,7 @@ class Search:
         self.search_metric = args.search_method
         self.top_k = args.top_k
         self.index_loc = args.index_loc
+        self.backend = args.backend
         self.retrieve: Retriever | None = None  # type: ignore
         self._load_retriever()
         self._load_docs()
@@ -29,20 +29,24 @@ class Search:
 
     def _load_retriever(self):
         if (
-            self.search_metric not in VECTOR_INDEX_PATHS
-            and self.search_metric not in WORD_EMBEDDING_INDEX_PATHS
-            and self.search_metric not in SENTENCE_EMBEDDINGS_INDEX_PATH
+            self.search_metric not in VECTORIZERS
+            and self.search_metric not in EMBEDDING_MODELS
         ):
             raise ValueError("Invalid search metric")
-        if self.search_metric in VECTOR_INDEX_PATHS:
-            self.retrieve: Retriever = VectorSearch(self.index_loc, self.search_metric)
+        if self.search_metric in VECTORIZERS:
+            self.retrieve: Retriever = VectorSearch(
+                self.index_loc, self.search_metric, self.backend
+            )
 
-        elif self.search_metric in WORD_EMBEDDING_INDEX_PATHS:
-            self.retrieve: Retriever = WordEmbeddingSearch(self.index_loc, self.search_metric)
+        elif self.search_metric in EMBEDDING_MODELS:
+            self.retrieve: Retriever = WordEmbeddingSearch(
+                self.index_loc, self.search_metric, self.backend
+            )
 
-        elif self.search_metric in SENTENCE_EMBEDDINGS_INDEX_PATH:
-            self.retrieve: Retriever = SentenceEmbeddingSearch(self.index_loc, self.search_metric)
-
+        elif self.search_metric in SENTENCE_EMBEDDING_MODELS:
+            self.retrieve: Retriever = SentenceEmbeddingSearch(
+                self.index_loc, self.search_metric, self.backend
+            )
 
     def _get_top_k(self, scores):
         k = min(self.top_k, len(scores))

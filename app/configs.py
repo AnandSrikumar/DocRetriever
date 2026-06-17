@@ -1,19 +1,35 @@
-WORD_EMBEDDING_MODELS = {
-    "word2vec": "word2vec-google-news-300",
-    "fasttext": "fasttext-wiki-news-subwords-300",
-}
+from dataclasses import dataclass
 
-WORD_EMBEDDING_INDEX_PATHS = {
-    "word2vec": "word2vec_embeddings.pkl",
-    "fasttext": "fasttext_embeddings.pkl",
+
+@dataclass(frozen=True)
+class ModelConfig:
+    model: str
+    index_name: str
+
+    def get_index_name(self, backend: str) -> str:
+        ext_map = {"pickle": ".pkl", "faiss": ".index"}
+        if backend not in ext_map:
+            raise ValueError("Unsupported backend.....")
+        return self.index_name + ext_map[backend]
+
+
+EMBEDDING_MODELS = {
+    "word2vec": ModelConfig(
+        model="word2vec-google-news-300", index_name="word2vec_embeddings"
+    ),
+    "fasttext": ModelConfig(
+        model="fasttext-wiki-news-subwords-300", index_name="fasttext_embeddings"
+    ),
 }
 
 SENTENCE_EMBEDDING_MODELS = {
-    "all-minilm": "sentence-transformers/all-MiniLM-L6-v2",
+    "all-minilm": ModelConfig(
+        model="sentence-transformers/all-MiniLM-L6-v2",
+        index_name="all_minilm_embeddings",
+    )
 }
 
-SENTENCE_EMBEDDINGS_INDEX_PATH = {"all-minilm": "all_minilm_embeddings.pkl"}
-
-VECTORIZER_PATHS = {"tfidf": "tfidf.pkl", "bow": "bow.pkl"}
-
-VECTOR_INDEX_PATHS = {"tfidf": "tfidf_vectors.pkl", "bow": "bow_vectors.pkl"}
+VECTORIZERS = {
+    "tfidf": ModelConfig(model="tfidf.pkl", index_name="tfidf_vectors"),
+    "bow": ModelConfig(model="bow.pkl", index_name="bow_vectors"),
+}

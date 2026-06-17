@@ -1,14 +1,14 @@
 import gensim.downloader as api
 import numpy as np
 
-from app.configs import WORD_EMBEDDING_MODELS
+from app.configs import EMBEDDING_MODELS
 
 
 class GensimEmbeds:
     def __init__(self, model: str):
-        if model not in WORD_EMBEDDING_MODELS:
+        if model not in EMBEDDING_MODELS:
             raise ValueError("Invalid word embedding model")
-        self.model = api.load(WORD_EMBEDDING_MODELS[model])
+        self.model = api.load(EMBEDDING_MODELS[model].model)
 
     def embed_chunk(self, chunk: str):
         vectors = [self.model[word] for word in chunk.split() if word in self.model]  # type: ignore

@@ -219,5 +219,7 @@ __marimo__/
 
 data/*
 indexed/*
+vector_indexed/*
+pickle_indexed/*
 results/*
 dry_run.py

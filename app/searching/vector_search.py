@@ -1,17 +1,19 @@
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from app.configs import VECTOR_INDEX_PATHS, VECTORIZER_PATHS
-from app.pickle_util import load_pickle
+from app.configs import VECTORIZERS
+from app.storage.storage_utils import load_obj
 from app.text_preprocess.preprocess import preprocess_text
 
 
 class VectorSearch:
-    def __init__(self, index_loc: str, search_metric: str):
-        self.vectorizer: TfidfTransformer | CountVectorizer = load_pickle(
-            f"{index_loc}/{VECTORIZER_PATHS[search_metric]}"
+    def __init__(self, index_loc: str, search_metric: str, backend: str = "pickle"):
+        self.vectorizer: TfidfTransformer | CountVectorizer = load_obj(
+            f"{index_loc}/{VECTORIZERS[search_metric].model}"
         )
-        self.vectors = load_pickle(f"{index_loc}/{VECTOR_INDEX_PATHS[search_metric]}")
+        self.vectors = load_obj(
+            f"{index_loc}/{VECTORIZERS[search_metric].get_index_name(backend)}"
+        )
 
     def retrieve_score(self, query: str):
         cleaned = preprocess_text([query])["vectors"]

@@ -8,7 +8,7 @@ class TransformerEmbeds:
     def __init__(self, model):
         if model not in SENTENCE_EMBEDDING_MODELS:
             raise ValueError("Invalid sentence transformer model")
-        self.model = SentenceTransformer(SENTENCE_EMBEDDING_MODELS[model])
+        self.model = SentenceTransformer(SENTENCE_EMBEDDING_MODELS[model].model)
 
     def embed_sentence(self, chunks: list[str]):
         vectors = self.model.encode(
