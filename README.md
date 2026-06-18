@@ -18,7 +18,7 @@ A light weight search engine for documents
 2. html
 
 
-## Indexing
+## Indexing 
 
 ```python
 index_parser = subparsers.add_parser("index", help="Create document index")
@@ -26,6 +26,11 @@ index_parser.add_argument("--data-dir", required=True)
 index_parser.add_argument("--chunking", default="recursive")
 index_parser.add_argument("--chunk-size", default=1000)
 index_parser.add_argument("--chunk-overlap", default=100)
+index_parser.add_argument(
+    "--retriever",
+    default="tfidf",
+    choices=["tfidf", "bow", "bm25", "word2vec", "fasttext", "all-minilm"],
+)
 index_parser.add_argument("--index-loc", default="indexed/")
 ```
 
@@ -43,7 +48,11 @@ this step will create `.pkl` files in the `indexed/` folder
 
 ```
 search_parser = subparsers.add_parser("search", help="Search documents")
-search_parser.add_argument("--search-method", default="tfidf")
+search_parser.add_argument(
+    "--retriever",
+    default="tfidf",
+    choices=["tfidf", "bow", "bm25", "word2vec", "fasttext", "all-minilm"],
+)
 search_parser.add_argument("--index-loc", default="indexed/")
 search_parser.add_argument("--top-k", default=3)
 ```
@@ -56,15 +65,16 @@ here, all fields are optional
 2. bow
 3. word2vec
 4. fasttext
+5. sentence-transformers/all-MiniLM-L6-v2
 
 #### future
 1. bm25
 2. sentence-transformers
 
 ```
-python main.py search --search-method tfidf  --top-k 1
+python main.py search --retriever tfidf --index-loc indexed/  --top-k 1
 
-python main.py search --search-method word2vec  --top-k 4
+python main.py search --retriever all-minilm --index-loc indexed/  --top-k 4
 ```
 
 ## performance
