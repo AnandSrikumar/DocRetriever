@@ -1,14 +1,11 @@
 from concurrent.futures import ProcessPoolExecutor
 
 from app.models.chunk import Chunk
-from app.text_preprocess.preprocess_funcs import (
-    lemmatize_text,
-    lower_text,
-    normalize_unicode,
-    rem_extra_spaces,
-    rem_special_chars,
-    rem_stop_words,
-)
+from app.text_preprocess.preprocess_funcs import (lemmatize_text, lower_text,
+                                                  normalize_unicode,
+                                                  rem_extra_spaces,
+                                                  rem_special_chars,
+                                                  rem_stop_words)
 
 
 def preprocess_pipeline(chunk: Chunk | str):
@@ -18,7 +15,7 @@ def preprocess_pipeline(chunk: Chunk | str):
     text = normalize_unicode(text)
     text = rem_extra_spaces(text)
     text = lemmatize_text(text)
-    return {"vector": text, "embed": rem_stop_words(text)}
+    return {"embed": text, "vector": rem_stop_words(text)}
 
 
 def preprocess_text(chunks: list[Chunk] | list[str]) -> dict[str, list[str]]:

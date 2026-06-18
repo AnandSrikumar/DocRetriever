@@ -5,7 +5,7 @@ import faiss
 import numpy as np
 
 
-def __serialize_pickle(obj, path: str):  # type: ignore
+def _serialize_pickle(obj, path: str):  # type: ignore
     path: Path = Path(path)  # type: ignore
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -13,15 +13,12 @@ def __serialize_pickle(obj, path: str):  # type: ignore
         pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def __deserialize_pickle(path: str):
+def _deserialize_pickle(path: str):
     with open(path, "rb") as f:
         return pickle.load(f)
 
 
-def __serialize_faiss(vectors, path: str):
-    if hasattr(vectors, "toarray"):
-        vectors = vectors.toarray()
-
+def _serialize_faiss(vectors, path: str):
     embeddings = np.asarray(
         vectors,
         dtype=np.float32,
@@ -29,16 +26,17 @@ def __serialize_faiss(vectors, path: str):
     dimension = embeddings.shape[1]
     index = faiss.IndexFlatIP(dimension)
     index.add(embeddings)
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
     faiss.write_index(index, path)
 
 
-def __deserialize_faiss(path: str):
+def _deserialize_faiss(path: str):
     return faiss.read_index(path)
 
 
-LOAD_HANDLERS = {"pkl": __deserialize_pickle, "index": __deserialize_faiss}
+LOAD_HANDLERS = {"pkl": _deserialize_pickle, "index": _deserialize_faiss}
 
-SAVE_HANDLERS = {"pkl": __serialize_pickle, "index": __serialize_faiss}
+SAVE_HANDLERS = {"pkl": _serialize_pickle, "index": _serialize_faiss}
 
 
 def save_obj(vectors, path: str):

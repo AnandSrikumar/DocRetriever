@@ -1,88 +1,114 @@
-import time
-from argparse import Namespace
+from uuid import UUID
 
 from app.chunking.chunker import chunk_docs
-from app.configs import EMBEDDING_MODELS, VECTORIZERS, SENTENCE_EMBEDDING_MODELS
+from app.configs import (EMBEDDING_MODELS, SENTENCE_EMBEDDING_MODELS,
+                         VECTORIZERS)
 from app.embeddings.gensim_embeds import GensimEmbeds
 from app.embeddings.transformer_embeds import TransformerEmbeds
 from app.file_loaders.loader import LoaderFactory
+from app.models.chunk import Chunk
 from app.models.document import Document
 from app.profiling_utils import timeit
+from app.storage.storage_utils import save_obj
 from app.text_preprocess.preprocess import preprocess_text
 from app.vectorizer import vectorize
-from app.storage.storage_utils import save_obj
 
 
-@timeit  # type: ignore
-def create_docs(data_dir: str, index_loc: str) -> list[Document]:
-    docs, doc_id_map = LoaderFactory.load(data_dir)
-    save_obj(doc_id_map, f"{index_loc}/doc_id_map.pkl")
-    return docs
+@timeit
+def load_docs(data_path: str, index_loc: str) -> dict[UUID, Document]:
+    doc_id_map = LoaderFactory.load(data_path)
+    print("Documents loaded...")
+    save_obj(doc_id_map, f"{index_loc}/documents.pkl")
+    print("Documents .pkl saved....")
+    return doc_id_map
 
 
-@timeit  # type: ignore
-def create_chunks(
-    docs: list[Document],
+@timeit
+def chunking(
+    doc_map: dict[UUID, Document],
     chunk_type: str,
     chunk_size: int,
     chunk_overlap: int,
     index_loc: str,
-) -> tuple[list[str], list[str]]:
-    chunks = chunk_docs(docs, chunk_type, chunk_size, chunk_overlap)
-    cleaned = preprocess_text(chunks)
-    cleaned_chunks = cleaned["vectors"]
-    cleaned_chunks_embeds = cleaned["embeds"]
+) -> list[Chunk]:
+    documents = list(doc_map.values())
+    chunks = chunk_docs(documents, chunk_type, chunk_size, chunk_overlap)
+    print("chunking done.....")
     save_obj(chunks, f"{index_loc}/chunks.pkl")
-    save_obj(cleaned_chunks, f"{index_loc}/cleaned_chunks.pkl")
-    save_obj(cleaned_chunks_embeds, f"{index_loc}/cleaned_chunks_embeds.pkl")
-    return cleaned_chunks, cleaned_chunks_embeds
+    return chunks
 
 
-@timeit  # type: ignore
-def create_vectors(
-    cleaned_chunks: list[str], index_loc: str, backend: str = "pickle"
-) -> None:
-    for model, model_config in VECTORIZERS.items():
-        vectorizer_path = model_config.model
-        vectorizer, vectors = vectorize(cleaned_chunks, model)
-        save_obj(vectorizer, f"{index_loc}/{vectorizer_path}")  # pickle for vectorizer
-        save_obj(
-            vectors, f"{index_loc}/{model_config.get_index_name(backend)}"
-        )  # pickle or faiss for vectors
-        print(f"vectors: {model} done...")
+@timeit
+def clean_chunks(chunks: list[Chunk]):
+    cleaned = preprocess_text(chunks)
+    print("chunks cleaned.....")
+    return cleaned
 
 
-@timeit  # type: ignore
-def create_embeds(
-    cleaned_chunks: list[str], index_loc: str, backend: str = "pickle"
-) -> None:
-    for model, model_config in EMBEDDING_MODELS.items():
-        gensim_model = GensimEmbeds(model)
-        word_embeddings = gensim_model.embed_chunks(cleaned_chunks)
-        save_obj(word_embeddings, f"{index_loc}/{model_config.get_index_name(backend)}")
-        print(f"Embeddings: {model} done....")
-    
-    for model, model_config in SENTENCE_EMBEDDING_MODELS.items():
-        transformer_model = TransformerEmbeds(model)
-        sent_embeddings = transformer_model.embed_sentence(cleaned_chunks)
-        save_obj(sent_embeddings, f"{index_loc}/{model_config.get_index_name(backend)}")
-        print(f"Embeddings: {model} done....")
+@timeit
+def create_vectors(cleaned_chunks: list[str], vector_type: str, index_loc: str):
+    if vector_type not in VECTORIZERS:
+        raise ValueError("Unsupported vectorizer....")
+    vectorizer, vectors = vectorize(cleaned_chunks, vector_type)
+    print("vectors created....")
+    vector_model_path = f"{index_loc}/{VECTORIZERS[vector_type].model}"
+    vectors_path = f'{index_loc}/{VECTORIZERS[vector_type].get_index_name("pickle")}'
+    save_obj(vectorizer, vector_model_path)
+    save_obj(vectors, vectors_path)
+    print("vectors saved.....")
 
 
-def build_index(args: Namespace):
-    index_loc = args.index_loc
-    docs = create_docs(args.data_dir, index_loc)
-    print("docs created....")
-
-    cleaned_chunks, cleaned_chunks_embeds = create_chunks(
-        docs, args.chunking, args.chunk_size, args.chunk_overlap, index_loc
+@timeit
+def create_word_embeddings(cleaned_chunks: list[str], embedding_type, index_loc: str):
+    embed = GensimEmbeds(embedding_type)
+    embeddings = embed.embed_chunks(cleaned_chunks)
+    print(f"{embedding_type} embeddings created....")
+    save_path = (
+        f"{index_loc}/{EMBEDDING_MODELS[embedding_type].get_index_name('faiss')}"
     )
-    print("chunking done...")
+    save_obj(embeddings, save_path)
+    print(f"{embedding_type} saved....")
 
-    create_vectors(cleaned_chunks, index_loc, args.backend)
 
-    print("Vectors done...")
+@timeit
+def create_sentence_embeddings(
+    cleaned_chunks: list[str], sent_embed: str, index_loc: str
+):
+    embed = TransformerEmbeds(sent_embed)
+    embeddings = embed.embed_sentence(cleaned_chunks)
+    print(f"{sent_embed} embeddings created....")
+    save_path = (
+        f"{index_loc}/{SENTENCE_EMBEDDING_MODELS[sent_embed].get_index_name('faiss')}"
+    )
+    save_obj(embeddings, save_path)
+    print(f"{sent_embed} saved....")
 
-    create_embeds(cleaned_chunks_embeds, index_loc, args.backend)
 
-    print("embeds done...")
+@timeit
+def build_tokenizer(
+    retriever: str, cleaned_chunks: dict[str, list[str]], index_loc: str
+):
+    if retriever in VECTORIZERS:
+        create_vectors(cleaned_chunks["vectors"], retriever, index_loc)
+    elif retriever in EMBEDDING_MODELS:
+        create_word_embeddings(cleaned_chunks["embeds"], retriever, index_loc)
+    elif retriever in SENTENCE_EMBEDDING_MODELS:
+        create_sentence_embeddings(cleaned_chunks["embeds"], retriever, index_loc)
+    else:
+        raise ValueError("Unsupported retriever...")
+
+
+@timeit
+def build_index(args):
+    data_path = args.data_dir
+    chunk_type = args.chunking
+    chunk_size = args.chunk_size
+    chunk_overlap = args.chunk_overlap
+    retriever = args.retriever
+    index_loc = args.index_loc
+
+    docs_map = load_docs(data_path, index_loc)
+    chunks = chunking(docs_map, chunk_type, chunk_size, chunk_overlap, index_loc)
+    cleaned_chunks = clean_chunks(chunks)
+
+    build_tokenizer(retriever, cleaned_chunks, index_loc)

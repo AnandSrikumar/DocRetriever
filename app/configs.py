@@ -33,3 +33,7 @@ VECTORIZERS = {
     "tfidf": ModelConfig(model="tfidf.pkl", index_name="tfidf_vectors"),
     "bow": ModelConfig(model="bow.pkl", index_name="bow_vectors"),
 }
+
+
+CHUNKS_PATHS = "chunks.pkl"
+DOCUMENTS_PATH = "documents.pkl"

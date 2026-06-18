@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -15,8 +16,14 @@ class VectorSearch:
             f"{index_loc}/{VECTORIZERS[search_metric].get_index_name(backend)}"
         )
 
-    def retrieve_score(self, query: str):
+    def retrieve_score(self, query: str, top_k: int):
         cleaned = preprocess_text([query])["vectors"]
         q_vector = self.vectorizer.transform(cleaned)  # type: ignore
         scores = cosine_similarity(q_vector, self.vectors)[0]
-        return scores
+        top_k = min(top_k, len(scores))
+
+        indices = np.argpartition(scores, -top_k)[-top_k:]
+
+        indices = indices[np.argsort(scores[indices])[::-1]]
+
+        return indices, scores[indices]

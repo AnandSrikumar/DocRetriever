@@ -8,11 +8,16 @@ from app.file_loaders.pdf_loader import PdfLoader
 from app.file_loaders.text_loader import TextLoader
 from app.models.document import Document
 
-loader_map = {"txt": TextLoader(), "pdf": PdfLoader(), "docx": DocxLoader()}
-
 
 class Loader(Protocol):
-    def load(self) -> Document: ...
+    def load(self, str) -> Document: ...
+
+
+loader_map: dict[str, Loader] = {
+    "txt": TextLoader,
+    "pdf": PdfLoader,
+    "docx": DocxLoader,
+}
 
 
 def _get_paths(docs_path: str):
@@ -26,10 +31,11 @@ def _get_paths(docs_path: str):
 
 def _parallel_load(file_path: Path) -> Document | None:
     extension = file_path.suffix.lower().lstrip(".")
-    loader: Loader | None = loader_map.get(extension)
-    if loader is None:
+    if extension not in loader_map:
         print(f"WARNING: Unsupported file type: {file_path.name}")
         return
+    loader: Loader = loader_map[extension]()
+
     try:
         document = loader.load(str(file_path))
         return document
@@ -55,4 +61,4 @@ class LoaderFactory:
             (time.perf_counter() - s),
             "seconds",
         )
-        return documents, {doc.id: doc for doc in documents}
+        return {doc.id: doc for doc in documents}
