@@ -15,6 +15,7 @@ MODEL_MAP = {
 class FaissSearch:
     def __init__(self, index_path, model: str):
         self.model = MODEL_MAP[model](model)
+        print(f"about to load {index_path}")
         self.index = load_obj(index_path)
 
     def retrieve_score(self, query: str, top_k):

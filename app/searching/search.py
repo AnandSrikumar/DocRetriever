@@ -1,7 +1,12 @@
 import numpy as np
 
-from app.configs import (CHUNKS_PATHS, DOCUMENTS_PATH, EMBEDDING_MODELS,
-                         SENTENCE_EMBEDDING_MODELS, VECTORIZERS)
+from app.configs import (
+    CHUNKS_PATHS,
+    DOCUMENTS_PATH,
+    EMBEDDING_MODELS,
+    SENTENCE_EMBEDDING_MODELS,
+    VECTORIZERS,
+)
 from app.searching.faiss_search import FaissSearch
 from app.searching.retrieve_docs import retrieve_doc
 from app.searching.vector_search import VectorSearch
@@ -27,15 +32,13 @@ class Search:
             print(f"Vectorizer {self.retriever} loaded")
 
         elif self.retriever in EMBEDDING_MODELS:
-            index_path = f"{EMBEDDING_MODELS[self.retriever].get_index_name('faiss')}"
+            index_path = f"{self.index_loc}/{EMBEDDING_MODELS[self.retriever].get_index_name('faiss')}"
             self.searcher = FaissSearch(index_path, self.retriever)
             print(f"word embedding model {self.retriever} loaded")
 
         elif self.retriever in SENTENCE_EMBEDDING_MODELS:
-            index_path = (
-                f"{SENTENCE_EMBEDDING_MODELS[self.retriever].get_index_name('faiss')}"
-            )
-            self.searcher = FaissSearch(self.index_loc, self.retriever)
+            index_path = f"{self.index_loc}/{SENTENCE_EMBEDDING_MODELS[self.retriever].get_index_name('faiss')}"
+            self.searcher = FaissSearch(index_path, self.retriever)
             print(f"Sentence embedding model {self.retriever} loaded")
 
         else:

@@ -1,8 +1,7 @@
 from uuid import UUID
 
 from app.chunking.chunker import chunk_docs
-from app.configs import (EMBEDDING_MODELS, SENTENCE_EMBEDDING_MODELS,
-                         VECTORIZERS)
+from app.configs import EMBEDDING_MODELS, SENTENCE_EMBEDDING_MODELS, VECTORIZERS
 from app.embeddings.gensim_embeds import GensimEmbeds
 from app.embeddings.transformer_embeds import TransformerEmbeds
 from app.file_loaders.loader import LoaderFactory
